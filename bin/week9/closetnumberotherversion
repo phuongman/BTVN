@@ -1,0 +1,89 @@
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import java.util.regex.*;
+import java.util.stream.*;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+
+class Result {
+
+    /*
+     * Complete the 'closestNumbers' function below.
+     *
+     * The function is expected to return an INTEGER_ARRAY.
+     * The function accepts INTEGER_ARRAY arr as parameter.
+     */
+    public static int[] tmp = new int[200005];
+    public static void MergeSort(List<Integer> arr, int l, int r) {
+        if(l == r) {
+            return;
+        }
+        int mid = (l + r) / 2;
+        MergeSort(arr, l, mid);
+        MergeSort(arr, mid + 1, r);
+        int cnt = 0;
+        int index1 = l, index2 = mid + 1;
+        while(index1 <= mid && index2 <= r) {
+            if(arr.get(index1) < arr.get(index2)) tmp[cnt++] = arr.get(index1++);
+            else tmp[cnt++] = arr.get(index2++);
+        }
+        while(index1 <= mid) tmp[cnt++] = arr.get(index1++);
+        while(index2 <= r) tmp[cnt++] = arr.get(index2++);
+        for(int i = 0; i < cnt; i++) arr.set(i + l, tmp[i]);
+     }
+    public static List<Integer> closestNumbers(List<Integer> arr) {
+    // Write your code here
+        MergeSort(arr, 0, (int) arr.size() - 1);
+        for(int i = 0; i < arr.size(); i++) {
+            System.out.print(arr.get(i) + " ");
+        }
+        int ma = -1;
+        List<Integer> res = new ArrayList<>();
+        for(int i = 0; i < arr.size() - 1; i++) {
+            int val = arr.get(i + 1) - arr.get(i); 
+            if(ma == -1) ma = val;
+            else ma = Math.min(ma, val);
+        }
+        for(int i = 0; i < arr.size() - 1; i++){
+            int u = arr.get(i);
+            int v = arr.get(i + 1);
+            if(v - u == ma) {
+                res.add(u);
+                res.add(v);
+            }
+        }
+        return res;
+
+    }
+
+}
+
+public class Solution {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int n = Integer.parseInt(bufferedReader.readLine().trim());
+
+        List<Integer> arr = Stream.of(bufferedReader.readLine().replaceAll("\\s+$", "").split(" "))
+            .map(Integer::parseInt)
+            .collect(toList());
+
+        List<Integer> result = Result.closestNumbers(arr);
+
+        bufferedWriter.write(
+            result.stream()
+                .map(Object::toString)
+                .collect(joining(" "))
+            + "\n"
+        );
+
+        bufferedReader.close();
+        bufferedWriter.close();
+    }
+}
